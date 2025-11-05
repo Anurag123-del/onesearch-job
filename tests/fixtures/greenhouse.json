@@ -1,0 +1,14 @@
+{
+  "jobs": [
+    {
+      "id": 12345,
+      "title": "Software Engineer",
+      "location": {
+        "name": "San Francisco, CA"
+      },
+      "absolute_url": "https://example.com/job1",
+      "content": "<p>Job description</p>",
+      "updated_at": "2023-10-27T10:00:00Z"
+    }
+  ]
+}

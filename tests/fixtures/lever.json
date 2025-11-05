@@ -1,0 +1,12 @@
+[
+  {
+    "id": "abcde",
+    "text": "Product Manager",
+    "categories": {
+      "location": "New York, NY"
+    },
+    "hostedUrl": "https://example.com/job2",
+    "description": "Product manager description",
+    "createdAt": 1635336000000
+  }
+]
