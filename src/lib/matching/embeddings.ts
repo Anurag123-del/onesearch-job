@@ -1,48 +1,55 @@
-export const embedText = async (text: string, progressCallback?: (progress: Record<string, unknown>) => void): Promise<number[]> => {
-  return new Promise((resolve, reject) => {
-    // Create a new worker instance
-    const worker = new Worker(new URL('./../../public/workers/embedding.worker.js', import.meta.url), {
-      type: 'module',
-    });
+class EmbeddingWorkerManager {
+  static worker: Worker | null = null;
+  static ready = false;
+  static queue: { text: string; resolve: (value: number[]) => void; reject: (reason?: any) => void }[] = [];
 
-    // Handle messages from the worker
-    worker.onmessage = (event) => {
-      const { status, output, error, ...progress } = event.data;
+  static getInstance() {
+    if (!this.worker) {
+      this.worker = new Worker('/workers/embedding.worker.js', {
+        type: 'module',
+      });
 
-      switch (status) {
-        case 'ready':
-          // The model is ready, we can now send the text
-          worker.postMessage(text);
-          break;
-
-        case 'update':
-          // Pass progress updates to the optional callback
-          if (progressCallback) {
-            progressCallback(progress);
+      this.worker.onmessage = (event) => {
+        const { status, output, error } = event.data;
+        if (status === 'ready') {
+          this.ready = true;
+          this.processQueue();
+        } else if (status === 'complete') {
+          const item = this.queue.shift();
+          if (item) {
+            item.resolve(output);
+            this.processQueue();
           }
-          break;
+        } else if (status === 'error') {
+          const item = this.queue.shift();
+          if (item) {
+            item.reject(error);
+            this.processQueue();
+          }
+        }
+      };
+    }
+    return this;
+  }
 
-        case 'complete':
-          // The embedding is complete, resolve the promise
-          resolve(output);
-          worker.terminate();
-          break;
+  static processQueue() {
+    if (this.ready && this.queue.length > 0) {
+      const item = this.queue[0];
+      this.worker?.postMessage(item.text);
+    }
+  }
 
-        case 'error':
-          // An error occurred, reject the promise
-          reject(error);
-          worker.terminate();
-          break;
+  static embedText(text: string): Promise<number[]> {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ text, resolve, reject });
+      if (this.ready) {
+        this.processQueue();
       }
-    };
+    });
+  }
+}
 
-    // Handle any errors that occur during worker initialization
-    worker.onerror = (error) => {
-      reject(error);
-      worker.terminate();
-    };
-
-    // Send the text to the worker to start the process
-    worker.postMessage(text);
-  });
+export const embedText = (text: string): Promise<number[]> => {
+  const manager = EmbeddingWorkerManager.getInstance();
+  return manager.embedText(text);
 };

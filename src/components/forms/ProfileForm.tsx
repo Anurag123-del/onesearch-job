@@ -5,13 +5,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { UserProfile } from '@/types';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
-import { WithContext as ReactTags } from 'react-tag-input';
 import { useState } from 'react';
-
+import TagInput from './TagInput';
 
 const schema = z.object({
   job_title: z.string().min(1, 'Job title is required'),
-  yoe: z.coerce.number().min(0, 'Years of experience must be a positive number'),
+  yoe: z.string().refine(val => !isNaN(parseInt(val, 10)) && parseInt(val, 10) >= 0, {
+    message: 'Years of experience must be a positive number',
+  }),
   skills: z.array(z.object({ id: z.string(), text: z.string() })).min(1, 'Please list at least one skill'),
   preferred_locations: z.array(z.object({ id: z.string(), text: z.string() })).min(1, 'Please list at least one location'),
 });
@@ -31,7 +32,7 @@ export default function ProfileForm({ profile }: { profile: UserProfile | null }
     resolver: zodResolver(schema),
     defaultValues: {
       job_title: profile?.job_title || '',
-      yoe: Number(profile?.yoe || 0),
+      yoe: String(profile?.yoe || 0),
       skills: profile?.skills?.map(s => ({ id: s, text: s })) || [],
       preferred_locations: profile?.preferred_locations?.map(l => ({ id: l, text: l })) || [],
     },
@@ -55,7 +56,7 @@ export default function ProfileForm({ profile }: { profile: UserProfile | null }
     const updatedProfile = {
       user_id: user.id,
       job_title: data.job_title,
-      yoe: data.yoe,
+      yoe: parseInt(data.yoe, 10),
       skills: data.skills.map(s => s.text),
       preferred_locations: data.preferred_locations.map(l => l.text),
       updated_at: new Date().toISOString(),
@@ -91,12 +92,9 @@ export default function ProfileForm({ profile }: { profile: UserProfile | null }
           name="skills"
           control={control}
           render={({ field }) => (
-            <ReactTags
-              tags={field.value}
-              handleDelete={(i) => field.onChange(field.value.filter((_, index) => index !== i))}
-              handleAddition={(tag) => field.onChange([...field.value, tag])}
-              inputFieldPosition="bottom"
-              autocomplete
+            <TagInput
+              {...field}
+              placeholder="Add a new skill"
             />
           )}
         />
@@ -108,12 +106,9 @@ export default function ProfileForm({ profile }: { profile: UserProfile | null }
           name="preferred_locations"
           control={control}
           render={({ field }) => (
-            <ReactTags
-              tags={field.value}
-              handleDelete={(i) => field.onChange(field.value.filter((_, index) => index !== i))}
-              handleAddition={(tag) => field.onChange([...field.value, tag])}
-              inputFieldPosition="bottom"
-              autocomplete
+            <TagInput
+              {...field}
+              placeholder="Add a new location"
             />
           )}
         />

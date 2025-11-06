@@ -57,6 +57,32 @@ export function normalizeRemoteOkJob(rawJob: Record<string, unknown>): JobItem |
   }
 
 
+export function normalizeAshbyJob(rawJob: Record<string, unknown>, companyName: string): JobItem | null {
+    if (!rawJob.id || !rawJob.title || !rawJob.url) return null;
+
+    return {
+      source: 'ashby',
+      company: companyName,
+      title: rawJob.title as string,
+      location: (rawJob.location as string) || 'Remote',
+      url: rawJob.url as string,
+      description: sanitize(rawJob.descriptionHtml as string),
+      skills_extracted: extractSkills(rawJob.descriptionHtml as string),
+      published_at: rawJob.publishedAt as string,
+    };
+  }
+
+export function normalizeWorkableJob(rawJob: Record<string, unknown>, companyName: string): JobItem | null {
+    console.warn("Workable normalizer not implemented.");
+    return null;
+}
+
+export function normalizeTeamtailorJob(rawJob: Record<string, unknown>, companyName: string): JobItem | null {
+    console.warn("Teamtailor normalizer not implemented.");
+    return null;
+}
+
+
 // Main normalizer function
 export function normalizeJob(
   rawJob: Record<string, unknown>,
@@ -68,9 +94,14 @@ export function normalizeJob(
       return normalizeGreenhouseJob(rawJob, companyName);
     case 'lever':
       return normalizeLeverJob(rawJob, companyName);
+    case 'ashby':
+      return normalizeAshbyJob(rawJob, companyName);
+    case 'workable':
+        return normalizeWorkableJob(rawJob, companyName);
+    case 'teamtailor':
+        return normalizeTeamtailorJob(rawJob, companyName);
     case 'remoteok':
         return normalizeRemoteOkJob(rawJob);
-    // TODO: Add Ashby, Workable, Teamtailor normalizers
     default:
       console.warn(`Normalization not implemented for source: ${source}`);
       return null;

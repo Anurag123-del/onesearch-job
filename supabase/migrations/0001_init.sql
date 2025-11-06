@@ -16,7 +16,8 @@ website text,
 ats_type text check (ats_type in ('greenhouse','lever','ashby','workable','teamtailor','remoteok','other')),
 feed_url text, -- public JSON endpoint if known
 is_active boolean default true,
-created_at timestamptz default now()
+created_at timestamptz default now(),
+constraint companies_name_key unique (name)
 );
 
 create table if not exists jobs (
@@ -30,7 +31,8 @@ description text,
 skills_extracted text[] default '{}',
 vector jsonb, -- store client-side vector if we ever persist it (optional)
 published_at timestamptz,
-ingested_at timestamptz default now()
+ingested_at timestamptz default now(),
+constraint jobs_url_key unique (url)
 );
 
 create index on jobs (source);

@@ -1,9 +1,9 @@
-// Using @xenova/transformers in a web worker
-import { pipeline, env } from '@xenova/transformers';
+// Use dynamic import to load transformers.js from a CDN in the worker
+self.importScripts('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1');
 
 // Configuration for the worker environment
-env.allowLocalModels = false;
-env.backends.onnx.wasm.numThreads = 1; // Use a single thread for background processing
+self.env.allowLocalModels = false;
+self.env.backends.onnx.wasm.numThreads = 1; // Use a single thread for background processing
 
 // Singleton class to ensure the model is loaded only once
 class EmbeddingPipeline {
@@ -13,7 +13,7 @@ class EmbeddingPipeline {
 
   static async getInstance(progress_callback) {
     if (this.instance === null) {
-      this.instance = await pipeline(this.task, this.model, { progress_callback });
+      this.instance = await self.pipeline(this.task, this.model, { progress_callback });
     }
     return this.instance;
   }

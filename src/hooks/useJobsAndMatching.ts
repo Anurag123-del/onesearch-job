@@ -42,9 +42,8 @@ export function useJobsAndMatching(profile: UserProfile | null) {
   }, []);
 
   useEffect(() => {
-    const hasJobs = jobs.length > 0;
     const runMatching = async () => {
-      if (!profile || !profile.job_title || !hasJobs) return;
+      if (!profile || !profile.job_title || jobs.length === 0 || jobs[0].score) return;
 
       setMatching(true);
       const profileText = buildProfileText(profile);

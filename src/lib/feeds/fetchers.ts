@@ -25,9 +25,35 @@ async function fetchGreenhouseJobs(feedUrl: string): Promise<Record<string, unkn
   return data?.jobs || [];
 }
 
+async function fetchWorkableJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
+    console.warn("Workable fetcher not implemented.");
+    return [];
+}
+
+async function fetchTeamtailorJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
+    console.warn("Teamtailor fetcher not implemented.");
+    return [];
+}
+
 async function fetchLeverJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
   const data = await fetchWithRetry(feedUrl) as Record<string, unknown>[];
   return data || [];
+}
+
+
+async function fetchWorkableJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
+    console.warn("Workable fetcher not implemented.");
+    return [];
+}
+
+async function fetchTeamtailorJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
+    console.warn("Teamtailor fetcher not implemented.");
+    return [];
+}
+
+async function fetchAshbyJobs(feedUrl: string): Promise<Record<string, unknown>[]> {
+  const data = await fetchWithRetry(feedUrl) as { jobs: Record<string, unknown>[] };
+  return data?.jobs || [];
 }
 
 async function fetchRemoteOkJobs(): Promise<Record<string, unknown>[]> {
@@ -63,6 +89,26 @@ export async function detectAndFetch(
       case 'lever':
         if (!feedUrl) throw new Error('Lever feed URL is required.');
         jobs = await fetchLeverJobs(feedUrl);
+        break;
+    case 'workable':
+        if (!feedUrl) throw new Error('Workable feed URL is required.');
+        jobs = await fetchWorkableJobs(feedUrl);
+        break;
+    case 'teamtailor':
+        if (!feedUrl) throw new Error('Teamtailor feed URL is required.');
+        jobs = await fetchTeamtailorJobs(feedUrl);
+        break;
+      case 'ashby':
+        if (!feedUrl) throw new Error('Ashby feed URL is required.');
+        jobs = await fetchAshbyJobs(feedUrl);
+        break;
+    case 'workable':
+        if (!feedUrl) throw new Error('Workable feed URL is required.');
+        jobs = await fetchWorkableJobs(feedUrl);
+        break;
+    case 'teamtailor':
+        if (!feedUrl) throw new Error('Teamtailor feed URL is required.');
+        jobs = await fetchTeamtailorJobs(feedUrl);
         break;
       case 'remoteok':
         jobs = await fetchRemoteOkJobs();
