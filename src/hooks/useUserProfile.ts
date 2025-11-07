@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { UserProfile } from '@/types';
+import { isGuestMode } from '@/lib/utils/guest';
+import { loadProfileFromStorage } from '@/lib/storage';
 
 export function useUserProfile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -8,6 +10,12 @@ export function useUserProfile() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isGuestMode()) {
+      setProfile(loadProfileFromStorage());
+      setLoading(false);
+      return;
+    }
+
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);

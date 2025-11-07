@@ -2,16 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useJobsAndMatching } from '@/hooks/useJobsAndMatching';
 import JobCard from '@/components/JobCard';
 import JobsFilters from '@/components/JobsFilters';
+import { isGuestMode } from '@/lib/utils/guest';
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 
 const JOBS_PER_PAGE = 10;
 
 export default function DashboardPage() {
   const router = useRouter();
+  const guestMode = isGuestMode();
   const { profile, loading: profileLoading } = useUserProfile();
   const { jobs, loading: jobsLoading, matching, handleFilterChange } = useJobsAndMatching(profile);
   const [page, setPage] = useState(1);
@@ -32,16 +34,24 @@ export default function DashboardPage() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Your Job Feed</h1>
-        <button onClick={handleLogout} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
-          Logout
-        </button>
+        {!guestMode && (
+          <button onClick={handleLogout} className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+            Logout
+          </button>
+        )}
       </div>
 
       {!profile?.job_title && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
-              <p className="font-bold">Complete Your Profile</p>
-              <p>To get personalized job matches, please <a href="/profile" className="underline">complete your profile</a>.</p>
-          </div>
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Welcome to OneSearch Job!</p>
+          <p>
+            To get personalized job matches, please{' '}
+            <a href="/profile" className="underline">
+              {guestMode ? 'create your guest profile' : 'complete your profile'}
+            </a>
+            .
+          </p>
+        </div>
       )}
 
       <JobsFilters onFilterChange={handleFilterChange} />

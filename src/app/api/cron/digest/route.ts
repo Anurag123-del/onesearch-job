@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { sendDigestEmail } from '@/lib/email/sendDigest';
 import { UserProfile, JobItem } from '@/types';
 import { NextResponse } from 'next/server';
+import { isGuestMode } from '@/lib/utils/guest';
 
 type JobWithScore = JobItem & { score?: number };
 
@@ -31,6 +32,9 @@ const scoreJobServerSide = (profile: UserProfile, job: JobItem): number => {
 
 
 export async function GET() {
+  if (isGuestMode()) {
+    return NextResponse.json({ message: "Digest cron job skipped in Guest Mode." });
+  }
   const supabase = createSupabaseServerClient();
 
   const { data: users, error: usersError } = await supabase.auth.admin.listUsers();

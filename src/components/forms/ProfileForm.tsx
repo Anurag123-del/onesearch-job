@@ -7,6 +7,9 @@ import { UserProfile } from '@/types';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { useState } from 'react';
 import TagInput from './TagInput';
+import { isGuestMode } from '@/lib/utils/guest';
+import { saveProfileToStorage } from '@/lib/storage';
+import { useRouter } from 'next/navigation';
 
 const schema = z.object({
   job_title: z.string().min(1, 'Job title is required'),
@@ -20,6 +23,7 @@ const schema = z.object({
 type ProfileFormData = z.infer<typeof schema>;
 
 export default function ProfileForm({ profile }: { profile: UserProfile | null }) {
+  const router = useRouter();
   const [statusMessage, setStatusMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
@@ -43,6 +47,23 @@ export default function ProfileForm({ profile }: { profile: UserProfile | null }
     setIsError(false);
 
     const supabase = createSupabaseBrowserClient();
+    if (isGuestMode()) {
+      const guestProfile: UserProfile = {
+        user_id: 'guest',
+        job_title: data.job_title,
+        yoe: parseInt(data.yoe, 10),
+        skills: data.skills.map(s => s.text),
+        preferred_locations: data.preferred_locations.map(l => l.text),
+      };
+      saveProfileToStorage(guestProfile);
+      setStatusMessage('Profile saved successfully!');
+      setIsError(false);
+      // Redirect to dashboard after saving
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 0);
+      return;
+    }
     const {
       data: { user },
     } = await supabase.auth.getUser();

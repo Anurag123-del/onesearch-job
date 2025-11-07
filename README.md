@@ -47,6 +47,23 @@ npm run seed:companies
 npm run seed:remoteok
 ```
 
+## Guest Mode
+
+This application includes a Guest Mode that allows users to try the app without creating an account. To enable Guest Mode, set the following environment variable:
+
+```
+NEXT_PUBLIC_GUEST_MODE=true
+```
+
+When Guest Mode is enabled, user profiles are stored in `localStorage` instead of the database, and all authentication flows are bypassed.
+
+### Guest Mode RLS Policies
+
+To support Guest Mode, the following Row Level Security (RLS) policies have been added to the database:
+
+-   **Read-only access to `jobs`:** Allows anonymous users to view job listings.
+-   **Read-only access to `companies`:** Allows anonymous users to view company information.
+
 ## Deployment
 
 This project is optimized for deployment on [Vercel](https://vercel.com/).

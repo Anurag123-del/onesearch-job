@@ -4,13 +4,22 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { isGuestMode } from '@/lib/utils/guest';
+import { useRouter } from 'next/navigation';
 
 const schema = z.object({
   email: z.string().email(),
 });
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isGuestMode()) {
+      router.push('/profile');
+    }
+  }, [router]);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 

@@ -1,7 +1,12 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isGuestMode } from '@/lib/utils/guest'
 
 export async function middleware(request: NextRequest) {
+  console.log('Guest Mode:', isGuestMode());
+  if (isGuestMode()) {
+    return NextResponse.next();
+  }
   let response = NextResponse.next({
     request: {
       headers: request.headers,
