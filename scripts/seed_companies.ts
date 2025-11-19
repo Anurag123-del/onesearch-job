@@ -1,7 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import postgres from 'postgres';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
-
 
 const companies = [
     // Greenhouse
@@ -24,26 +23,28 @@ const companies = [
     { name: 'Vercel', website: 'https://vercel.com', ats_type: 'ashby', feed_url: 'https://jobs.ashbyhq.com/api/non-user-boards/company/vercel' },
     { name: 'OpenAI', website: 'https://openai.com', ats_type: 'ashby', feed_url: 'https://jobs.ashbyhq.com/api/non-user-boards/company/openai' },
     { name: 'Ramp', website: 'https://ramp.com', ats_type: 'ashby', feed_url: 'https://jobs.ashbyhq.com/api/non-user-boards/company/ramp' },
-
 ];
 
 async function seedCompanies() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const connectionString = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('Supabase URL or service key not found. Make sure to set them in your .env.local file.');
+  if (!connectionString) {
+    console.error('Database connection string not found. Make sure to set SUPABASE_SERVICE_ROLE_KEY in your .env.local file.');
     return;
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const sql = postgres(connectionString, { ssl: 'require' });
 
-  const { error } = await supabase.from('companies').upsert(companies, { onConflict: 'name' });
-
-  if (error) {
-    console.error('Error seeding companies:', error);
-  } else {
+  try {
+    await sql`
+      insert into companies ${sql(companies, 'name', 'website', 'ats_type', 'feed_url')}
+      on conflict (name) do nothing
+    `;
     console.log(`Successfully seeded ${companies.length} companies.`);
+  } catch (error) {
+    console.error('Error seeding companies:', error);
+  } finally {
+    await sql.end();
   }
 }
 

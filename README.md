@@ -1,78 +1,70 @@
 # OneSearch Job
 
-OneSearch Job is a web application that helps job candidates find relevant job openings by aggregating listings from multiple sources and ranking them based on a personalized relevance score.
+OneSearch Job is a production-quality web app that helps candidates find relevant job opportunities by aggregating from multiple sources, computing client-side match scores using embeddings, and sending a daily top-10 digest.
 
-## Features
+## Overview & Features
 
-- **User Profiles**: Create a profile with your job title, years of experience, skills, and preferred locations.
-- **Job Aggregation**: Ingests jobs from Greenhouse, Lever, Ashby, and RemoteOK.
-- **Client-Side Matching**: Computes a relevance score for each job using in-browser embeddings.
-- **Daily Digests**: Receive a daily email with your top 10 job matches.
+- **Multi-Source Aggregation**: Ingests jobs from stable Tier A sources (Greenhouse, Lever, RemoteOK) and high-volume Tier B sources (LinkedIn, Naukri, Instahyre, Indeed).
+- **Semantic Search**: Uses OpenAI's `text-embedding-3-large` to provide highly relevant job matches based on semantic similarity.
+- **Weighted Ranking**: Ranks jobs using a weighted formula that considers title similarity, skills match, location preference, and more.
+- **Hardened Scraping**: Tier B sources are accessed via a hardened scraping layer with proxy rotation, user-agent switching, and graceful error handling.
+- **Feature-Flagged Connectors**: Each high-risk data source can be enabled or disabled individually via environment variables.
+- **Modern Frontend**: Built with Next.js 14, TypeScript, and TailwindCSS, with a clean, responsive UI.
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14 (App Router) + React + TypeScript + TailwindCSS
-- **Hosting**: Vercel
-- **Auth & DB**: Supabase
-- **Cron Jobs**: Vercel Cron
-- **Email**: Brevo SMTP
-- **Matching**: `onnxruntime-web` + `all-MiniLM-L6-v2`
+- **Hosting**: Vercel (Hobby)
+- **Auth + DB**: Supabase (Free Tier with pgvector)
+- **Embeddings**: OpenAI `text-embedding-3-large`
+- **Scraping**: Playwright with Stealth
+- **Email**: Brevo SMTP (Free Plan)
+- **CI/CD**: GitHub Actions
 
 ## Getting Started
 
-### 1. Set up your Supabase project
+### 1. Set up Supabase
 
 1.  Create a new project on [Supabase](https://supabase.com/).
-2.  In the SQL Editor, run the schema from `/supabase/migrations/0001_init.sql`.
-3.  Go to **Project Settings -> API** and get your **Project URL** and **anon key**.
+2.  In your project's SQL Editor, run the contents of the migration files in the `/supabase/migrations` directory in order, starting with `0001_init.sql`.
+3.  Go to **Project Settings -> API** to find your Supabase URL and `anon` key.
+4.  Go to **Project Settings -> Database -> Password** to get your database password, which is part of the `SUPABASE_SERVICE_ROLE_KEY`.
 
-### 2. Set up your environment variables
+### 2. Set up Environment Variables
 
-1.  Copy `.env.example` to `.env.local`.
-2.  Fill in the values for `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-3.  Set up an SMTP provider (like Brevo) and fill in the `SMTP_*` variables.
-4.  Generate a secret token for the `ADMIN_TOKEN` variable.
-
-### 3. Install dependencies and run the app
+Copy the `.env.example` file to `.env.local` and fill in the required values:
 
 ```bash
-npm install
-npm run dev
+cp .env.example .env.local
 ```
 
-### 4. Seed the database
+See the `.env.example` file for a detailed explanation of each variable.
+
+### 3. Install Dependencies and Run
 
 ```bash
-npm run seed:companies
-npm run seed:remoteok
+pnpm install
+pnpm dev
 ```
 
-## Guest Mode
+The application will be available at `http://localhost:3000`.
 
-This application includes a Guest Mode that allows users to try the app without creating an account. To enable Guest Mode, set the following environment variable:
+## Ingestion Pipeline
 
-```
-NEXT_PUBLIC_GUEST_MODE=true
-```
+The ingestion pipeline is managed by a cron job located at `/app/api/cron/ingest/route.ts`. You can trigger it manually by sending a POST request to this endpoint.
 
-When Guest Mode is enabled, user profiles are stored in `localStorage` instead of the database, and all authentication flows are bypassed.
+### Configuration
 
-### Guest Mode RLS Policies
+The ingestion pipeline is highly configurable via environment variables. You can enable or disable individual data sources, set rate limits, and configure proxy settings. See the `.env.example` file for more details.
 
-To support Guest Mode, the following Row Level Security (RLS) policies have been added to the database:
+## Operational Runbook
 
--   **Read-only access to `jobs`:** Allows anonymous users to view job listings.
--   **Read-only access to `companies`:** Allows anonymous users to view company information.
+- **Monitoring**: The health of the Tier B scrapers can be monitored by observing the logs for 403/429 errors and the overall success rate of the ingestion cron job.
+- **Kill Switches**: Each Tier B connector can be disabled immediately by setting its corresponding `ENABLE_*` environment variable to `false`.
+- **Proxy Management**: Ensure your proxy pool is healthy and has a sufficient number of IP addresses to avoid being blocked.
 
-## Deployment
+## Phase 2 Roadmap
 
-This project is optimized for deployment on [Vercel](https://vercel.com/).
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-username%2Fonesearch-job)
-
-## Phase 2 TODO
-
--   [ ] Integrate Google Programmable Search + Cloud Run extractor.
--   [ ] Add more ATS sources (Workable, Teamtailor).
--   [ ] Implement end-to-end tests.
--   [ ] Add more robust error handling and logging.
+- **Advanced Filtering**: Add more sophisticated filtering options to the UI, such as salary range, company size, and more.
+- **User Dashboard**: Create a dashboard where users can track their applications and manage their job matches.
+- **Observability**: Implement a proper observability stack with structured logging and monitoring to track the health of the ingestion pipeline.

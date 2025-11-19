@@ -1,0 +1,69 @@
+
+> onesearch-job@0.1.0 pretest:e2e /app
+> kill -9 $(lsof -t -i:3000) || echo 'No process to kill.'
+
+sh: 1: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or
+kill -l [exitstatus]
+No process to kill.
+
+> onesearch-job@0.1.0 test:e2e /app
+> ./node_modules/.bin/playwright test
+
+[1A[2K[2m[WebServer] [22m [31m[1m⨯[22m[39m ./lib/matching/embeddings.ts:8:21
+[2m[WebServer] [22m[31m[1mModule not found[22m[39m: Can't resolve '[32m./embedding.worker.js[39m'
+[2m[WebServer] [22m[0m [90m  6 |[39m   [36mstatic[39m getInstance() {[0m
+[2m[WebServer] [22m[0m [90m  7 |[39m     [36mif[39m ([33m![39m[36mthis[39m[33m.[39mworker) {[0m
+[2m[WebServer] [22m[0m[31m[1m>[22m[39m[90m  8 |[39m       [36mthis[39m[33m.[39mworker [33m=[39m [36mnew[39m [33mWorker[39m([36mnew[39m [33mURL[39m([32m'./embedding.worker.js'[39m[33m,[39m [36mimport[39m[33m.[39mmeta[33m.[39murl)[33m,[39m {[0m
+[2m[WebServer] [22m[0m [90m    |[39m                     [31m[1m^[22m[39m[0m
+[2m[WebServer] [22m[0m [90m  9 |[39m         type[33m:[39m [32m'module'[39m[33m,[39m[0m
+[2m[WebServer] [22m[0m [90m 10 |[39m       })[33m;[39m[0m
+[2m[WebServer] [22m[0m [90m 11 |[39m[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22mhttps://nextjs.org/docs/messages/module-not-found
+[2m[WebServer] [22m
+[2m[WebServer] [22mImport trace for requested module:
+[2m[WebServer] [22m./hooks/useJobsAndMatching.ts
+[2m[WebServer] [22m./app/page.tsx
+
+[1A[2K[2m[WebServer] [22m<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (125kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+
+[1A[2K[2m[WebServer] [22m [31m[1m⨯[22m[39m ./lib/matching/embeddings.ts:8:21
+[2m[WebServer] [22m[31m[1mModule not found[22m[39m: Can't resolve '[32m./embedding.worker.js[39m'
+[2m[WebServer] [22m[0m [90m  6 |[39m   [36mstatic[39m getInstance() {[0m
+[2m[WebServer] [22m[0m [90m  7 |[39m     [36mif[39m ([33m![39m[36mthis[39m[33m.[39mworker) {[0m
+[2m[WebServer] [22m[0m[31m[1m>[22m[39m[90m  8 |[39m       [36mthis[39m[33m.[39mworker [33m=[39m [36mnew[39m [33mWorker[39m([36mnew[39m [33mURL[39m([32m'./embedding.worker.js'[39m[33m,[39m [36mimport[39m[33m.[39mmeta[33m.[39murl)[33m,[39m {[0m
+[2m[WebServer] [22m[0m [90m    |[39m                     [31m[1m^[22m[39m[0m
+[2m[WebServer] [22m[0m [90m  9 |[39m         type[33m:[39m [32m'module'[39m[33m,[39m[0m
+[2m[WebServer] [22m[0m [90m 10 |[39m       })[33m;[39m[0m
+[2m[WebServer] [22m[0m [90m 11 |[39m[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22mhttps://nextjs.org/docs/messages/module-not-found
+[2m[WebServer] [22m
+[2m[WebServer] [22mImport trace for requested module:
+[2m[WebServer] [22m./hooks/useJobsAndMatching.ts
+[2m[WebServer] [22m./app/page.tsx
+
+[1A[2K[2m[WebServer] [22m [31m[1m⨯[22m[39m ./lib/matching/embeddings.ts:8:21
+[2m[WebServer] [22m[31m[1mModule not found[22m[39m: Can't resolve '[32m./embedding.worker.js[39m'
+[2m[WebServer] [22m[0m [90m  6 |[39m   [36mstatic[39m getInstance() {[0m
+[2m[WebServer] [22m[0m [90m  7 |[39m     [36mif[39m ([33m![39m[36mthis[39m[33m.[39mworker) {[0m
+[2m[WebServer] [22m[0m[31m[1m>[22m[39m[90m  8 |[39m       [36mthis[39m[33m.[39mworker [33m=[39m [36mnew[39m [33mWorker[39m([36mnew[39m [33mURL[39m([32m'./embedding.worker.js'[39m[33m,[39m [36mimport[39m[33m.[39mmeta[33m.[39murl)[33m,[39m {[0m
+[2m[WebServer] [22m[0m [90m    |[39m                     [31m[1m^[22m[39m[0m
+[2m[WebServer] [22m[0m [90m  9 |[39m         type[33m:[39m [32m'module'[39m[33m,[39m[0m
+[2m[WebServer] [22m[0m [90m 10 |[39m       })[33m;[39m[0m
+[2m[WebServer] [22m[0m [90m 11 |[39m[0m
+[2m[WebServer] [22m
+[2m[WebServer] [22mhttps://nextjs.org/docs/messages/module-not-found
+[2m[WebServer] [22m
+[2m[WebServer] [22mImport trace for requested module:
+[2m[WebServer] [22m./hooks/useJobsAndMatching.ts
+[2m[WebServer] [22m./app/page.tsx
+
+Error: Timed out waiting 60000ms from config.webServer.
+
+[1A[2K
+To open last HTML report run:
+[36m[39m
+[36m  pnpm exec playwright show-report[39m
+[36m[39m
+ ELIFECYCLE  Command failed with exit code 1.

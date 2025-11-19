@@ -1,0 +1,22 @@
+[
+  {
+    "source": "greenhouse",
+    "company": "Test Company 1",
+    "title": "Frontend Engineer",
+    "location": "Remote",
+    "url": "https://example.com/job1",
+    "description": "A frontend engineer job using React.",
+    "skills_extracted": ["React", "TypeScript"],
+    "published_at": "2023-11-06T10:00:00Z"
+  },
+  {
+    "source": "lever",
+    "company": "Test Company 2",
+    "title": "Backend Engineer",
+    "location": "San Francisco, CA",
+    "url": "https://example.com/job2",
+    "description": "A backend engineer job using Node.js.",
+    "skills_extracted": ["Node.js", "PostgreSQL"],
+    "published_at": "2023-11-06T11:00:00Z"
+  }
+]
